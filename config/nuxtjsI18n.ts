@@ -1,2 +1,1 @@
-export default defineI18nConfig(() => ({
-}))
+export default defineI18nConfig(() => ({}));

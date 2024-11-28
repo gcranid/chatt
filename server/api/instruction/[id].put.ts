@@ -3,7 +3,7 @@ import prisma from "@/server/utils/prisma";
 const updateInstructions = async (
   id: string,
   name: string,
-  instruction: string
+  instruction: string,
 ) => {
   try {
     return await prisma.instruction.upsert({

@@ -1,18 +1,18 @@
 export const MODEL_FAMILIES = {
-  openai: 'OpenAI',
-  azureOpenai: 'Azure OpenAI',
-  anthropic: 'Anthropic',
-  moonshot: 'Moonshot',
-  gemini: 'Gemini',
-  groq: 'Groq'
-}
+  openai: "OpenAI",
+  azureOpenai: "Azure OpenAI",
+  anthropic: "Anthropic",
+  moonshot: "Moonshot",
+  gemini: "Gemini",
+  groq: "Groq",
+};
 
 // OpenAI models will be loaded dynamically
-export let OPENAI_GPT_MODELS: string[] = []
+export let OPENAI_GPT_MODELS: string[] = [];
 
 // Function to update OpenAI models
 export function updateOpenAIModels(models: string[]) {
-  OPENAI_GPT_MODELS = models
+  OPENAI_GPT_MODELS = models;
 }
 
 export const AZURE_OPENAI_GPT_MODELS = [
@@ -20,18 +20,16 @@ export const AZURE_OPENAI_GPT_MODELS = [
   "gpt-35-turbo-16k",
   "gpt-35-turbo-instruct",
   "gpt-4",
-  "gpt-4-32k"
-]
+  "gpt-4-32k",
+];
 
 export const OPENAI_EMBEDDING_MODELS = [
   "text-embedding-3-large",
   "text-embedding-3-small",
-  "text-embedding-ada-002"
-]
+  "text-embedding-ada-002",
+];
 
-export const GEMINI_EMBEDDING_MODELS = [
-  "embedding-001"
-]
+export const GEMINI_EMBEDDING_MODELS = ["embedding-001"];
 
 export const ANTHROPIC_MODELS = [
   "claude-3-haiku-20240307",
@@ -39,21 +37,21 @@ export const ANTHROPIC_MODELS = [
   "claude-3-sonnet-20240229",
   "claude-2.1",
   "claude-2.0",
-  "claude-instant-1.2"
-]
+  "claude-instant-1.2",
+];
 
 export const MOONSHOT_MODELS = [
   "moonshot-v1-8k",
   "moonshot-v1-32k",
-  "moonshot-v1-128k"
-]
+  "moonshot-v1-128k",
+];
 
 export const GEMINI_MODELS = [
   "gemini-1.0-pro",
   "gemini-1.0-pro-vision-latest",
   "gemini-1.5-flash-latest",
-  "gemini-1.5-pro-latest"
-]
+  "gemini-1.5-pro-latest",
+];
 
 export const GROQ_MODELS = [
   "llama-3.1-405b-reasoning",
@@ -65,4 +63,4 @@ export const GROQ_MODELS = [
   "mixtral-8x7b-32768",
   "gemma-7b-it",
   "gemma2-9b-it",
-]
+];

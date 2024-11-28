@@ -1,7 +1,3 @@
 {
-  "recommendations": [
-    "lokalise.i18n-ally",
-    "vue.volar",
-    "usernamehw.errorlens"
-  ]
+  "recommendations": ["lokalise.i18n-ally", "vue.volar", "usernamehw.errorlens"]
 }

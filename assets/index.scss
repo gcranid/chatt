@@ -1,19 +1,27 @@
-@import 'highlight.js/scss/github.scss';
-@import './markdown.scss';
+@import "highlight.js/scss/github.scss";
+@import "./markdown.scss";
 
 .dark {
-  @import 'highlight.js/scss/github-dark.scss';
+  @import "highlight.js/scss/github-dark.scss";
 }
 
 html,
 body,
 #__nuxt {
   height: 100%;
-  font-family: "Noto Sans", SF Pro SC, SF Pro Text, SF Pro Icons, PingFang SC, Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-family:
+    "Noto Sans",
+    SF Pro SC,
+    SF Pro Text,
+    SF Pro Icons,
+    PingFang SC,
+    Helvetica Neue,
+    Helvetica,
+    Arial,
+    sans-serif;
 }
 
 body {
-
   code,
   pre,
   kbd,
@@ -46,7 +54,7 @@ body {
     list-style: initial;
   }
 
-  li>p {
+  li > p {
     display: inline;
   }
 }

@@ -1,45 +1,50 @@
 <script setup lang="ts">
-import { object, string } from 'yup'
+import { object, string } from "yup";
 
 definePageMeta({
   auth: {
     unauthenticatedOnly: true,
-    navigateAuthenticatedTo: '/'
-  }
-})
+    navigateAuthenticatedTo: "/",
+  },
+});
 
-const { t } = useI18n()
-const { signIn } = useAuth()
-const toast = useToast()
+const { t } = useI18n();
+const { signIn } = useAuth();
+const toast = useToast();
 
-const loading = ref(false)
+const loading = ref(false);
 const schema = object({
-  name: string().min(1, t("auth.nameRule1")).required(t('global.required')),
-  password: string().min(8, t('auth.passwordRule1')).required(t('global.required'))
-})
+  name: string().min(1, t("auth.nameRule1")).required(t("global.required")),
+  password: string()
+    .min(8, t("auth.passwordRule1"))
+    .required(t("global.required")),
+});
 
 const state = reactive({
   name: undefined,
-  password: undefined
-})
+  password: undefined,
+});
 
 async function onSubmit() {
-  loading.value = true
+  loading.value = true;
   try {
-    await signIn({
-      username: state.name,
-      password: state.password
-    }, {
-      callbackUrl: '/'
-    })
+    await signIn(
+      {
+        username: state.name,
+        password: state.password,
+      },
+      {
+        callbackUrl: "/",
+      },
+    );
   } catch (error: any) {
     toast.add({
-      title: t('auth.failedLoginTitle'),
+      title: t("auth.failedLoginTitle"),
       description: error?.statusMessage || error,
-      color: 'red'
-    })
+      color: "red",
+    });
   }
-  loading.value = false
+  loading.value = false;
 }
 </script>
 <template>
@@ -49,7 +54,12 @@ async function onSubmit() {
         <h1 class="font-bold text-2xl text-center">{{ t("auth.signIn") }}</h1>
       </template>
 
-      <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
+      <UForm
+        :schema="schema"
+        :state="state"
+        class="space-y-4"
+        @submit="onSubmit"
+      >
         <UFormGroup :label="t('global.name')" name="name">
           <UInput v-model="state.name" />
         </UFormGroup>
@@ -59,11 +69,17 @@ async function onSubmit() {
         </UFormGroup>
 
         <div class="pt-4">
-          <UButton size="lg" class="block w-full" type="submit" :loading="loading">{{ t("global.continue") }}</UButton>
+          <UButton
+            size="lg"
+            class="block w-full"
+            type="submit"
+            :loading="loading"
+            >{{ t("global.continue") }}</UButton
+          >
         </div>
         <div class="text-sm">
-          <span>{{ t('auth.noAccount') }}</span>
-          <UButton to="/signup" variant="link">{{ t('auth.signUp') }}</UButton>
+          <span>{{ t("auth.noAccount") }}</span>
+          <UButton to="/signup" variant="link">{{ t("auth.signUp") }}</UButton>
         </div>
       </UForm>
     </UCard>

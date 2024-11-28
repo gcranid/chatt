@@ -1,44 +1,44 @@
 import {
   GenerativeModel,
   GoogleGenerativeAI as GenerativeAI,
-} from "@google/generative-ai"
-import type { SafetySetting } from "@google/generative-ai"
-import { CallbackManagerForLLMRun } from "@langchain/core/callbacks/manager"
-import { BaseMessage } from "@langchain/core/messages"
-import { ChatGenerationChunk, ChatResult } from "@langchain/core/outputs"
-import { getEnvironmentVariable } from "@langchain/core/utils/env"
+} from "@google/generative-ai";
+import type { SafetySetting } from "@google/generative-ai";
+import { CallbackManagerForLLMRun } from "@langchain/core/callbacks/manager";
+import { BaseMessage } from "@langchain/core/messages";
+import { ChatGenerationChunk, ChatResult } from "@langchain/core/outputs";
+import { getEnvironmentVariable } from "@langchain/core/utils/env";
 import {
   BaseChatModel,
   type BaseChatModelParams,
-} from "@langchain/core/language_models/chat_models"
-import { NewTokenIndices } from "@langchain/core/callbacks/base"
+} from "@langchain/core/language_models/chat_models";
+import { NewTokenIndices } from "@langchain/core/callbacks/base";
 import {
   convertBaseMessagesToContent,
   convertResponseContentToChatGenerationChunk,
   mapGenerateContentResultToChatResult,
-} from "./utils"
+} from "./utils";
 
 interface TokenUsage {
-  completionTokens?: number
-  promptTokens?: number
-  totalTokens?: number
+  completionTokens?: number;
+  promptTokens?: number;
+  totalTokens?: number;
 }
 
 export type BaseMessageExamplePair = {
-  input: BaseMessage
-  output: BaseMessage
-}
+  input: BaseMessage;
+  output: BaseMessage;
+};
 
 /**
  * An interface defining the input to the ChatGoogleGenerativeAI class.
  */
 export interface GoogleGenerativeAIChatInput extends BaseChatModelParams {
-  baseUrl?: string
+  baseUrl?: string;
   /**
-     * Version of API endpoint to call (e.g. "v1" or "v1beta"). If not specified,
-     * defaults to latest stable version.
-     */
-  apiVersion?: string
+   * Version of API endpoint to call (e.g. "v1" or "v1beta"). If not specified,
+   * defaults to latest stable version.
+   */
+  apiVersion?: string;
   /**
    * Model Name to use
    *
@@ -46,13 +46,13 @@ export interface GoogleGenerativeAIChatInput extends BaseChatModelParams {
    *
    * Note: The format must follow the pattern - `{model}`
    */
-  modelName?: string
+  modelName?: string;
   /**
    * Model Name to use
    *
    * Note: The format must follow the pattern - `{model}`
    */
-  model?: string
+  model?: string;
 
   /**
    * Controls the randomness of the output.
@@ -64,12 +64,12 @@ export interface GoogleGenerativeAIChatInput extends BaseChatModelParams {
    *
    * Note: The default value varies by model
    */
-  temperature?: number
+  temperature?: number;
 
   /**
    * Maximum number of tokens to generate in the completion.
    */
-  maxOutputTokens?: number
+  maxOutputTokens?: number;
 
   /**
    * Top-p changes how the model selects tokens for output.
@@ -83,7 +83,7 @@ export interface GoogleGenerativeAIChatInput extends BaseChatModelParams {
    *
    * Note: The default value varies by model
    */
-  topP?: number
+  topP?: number;
 
   /**
    * Top-k changes how the model selects tokens for output.
@@ -95,7 +95,7 @@ export interface GoogleGenerativeAIChatInput extends BaseChatModelParams {
    *
    * Note: The default value varies by model
    */
-  topK?: number
+  topK?: number;
 
   /**
    * The set of character sequences (up to 5) that will stop output generation.
@@ -105,7 +105,7 @@ export interface GoogleGenerativeAIChatInput extends BaseChatModelParams {
    * Note: The stop sequence will not be included as part of the response.
    * Note: stopSequences is only supported for Gemini models
    */
-  stopSequences?: string[]
+  stopSequences?: string[];
 
   /**
    * A list of unique `SafetySetting` instances for blocking unsafe content. The API will block
@@ -113,15 +113,15 @@ export interface GoogleGenerativeAIChatInput extends BaseChatModelParams {
    * is no `SafetySetting` for a given `SafetyCategory` provided in the list, the API will use
    * the default safety setting for that category.
    */
-  safetySettings?: SafetySetting[]
+  safetySettings?: SafetySetting[];
 
   /**
    * Google API key to use
    */
-  apiKey?: string
+  apiKey?: string;
 
   /** Whether to stream the results or not */
-  streaming?: boolean
+  streaming?: boolean;
 }
 
 /**
@@ -155,9 +155,10 @@ export interface GoogleGenerativeAIChatInput extends BaseChatModelParams {
  */
 export class ChatGoogleGenerativeAI
   extends BaseChatModel
-  implements GoogleGenerativeAIChatInput {
+  implements GoogleGenerativeAIChatInput
+{
   static lc_name() {
-    return "googlegenerativeai"
+    return "googlegenerativeai";
   }
 
   lc_serializable = true;
@@ -165,205 +166,208 @@ export class ChatGoogleGenerativeAI
   get lc_secrets(): { [key: string]: string } | undefined {
     return {
       apiKey: "GOOGLE_API_KEY",
-    }
+    };
   }
 
   modelName = "gemini-pro";
 
   model = "gemini-pro";
 
-  temperature?: number // default value chosen based on model
+  temperature?: number; // default value chosen based on model
 
-  maxOutputTokens?: number
+  maxOutputTokens?: number;
 
-  topP?: number // default value chosen based on model
+  topP?: number; // default value chosen based on model
 
-  topK?: number // default value chosen based on model
+  topK?: number; // default value chosen based on model
 
   stopSequences: string[] = [];
 
-  safetySettings?: SafetySetting[]
+  safetySettings?: SafetySetting[];
 
-  apiKey?: string
+  apiKey?: string;
 
-  apiVersion: string = "v1"
+  apiVersion: string = "v1";
 
   streaming = false;
 
-  private client: GenerativeModel
+  private client: GenerativeModel;
 
   get _isMultimodalModel() {
-    return this.model.includes("vision") || this.model.startsWith("gemini-1.5")
+    return this.model.includes("vision") || this.model.startsWith("gemini-1.5");
   }
 
   constructor(fields?: GoogleGenerativeAIChatInput) {
-    super(fields ?? {})
+    super(fields ?? {});
 
     this.modelName =
       fields?.model?.replace(/^models\//, "") ??
       fields?.modelName?.replace(/^models\//, "") ??
-      this.model
-    this.model = this.modelName
+      this.model;
+    this.model = this.modelName;
 
-    this.maxOutputTokens = fields?.maxOutputTokens ?? this.maxOutputTokens
+    this.maxOutputTokens = fields?.maxOutputTokens ?? this.maxOutputTokens;
 
     if (this.maxOutputTokens && this.maxOutputTokens < 0) {
-      throw new Error("`maxOutputTokens` must be a positive integer")
+      throw new Error("`maxOutputTokens` must be a positive integer");
     }
 
-    this.temperature = fields?.temperature ?? this.temperature
+    this.temperature = fields?.temperature ?? this.temperature;
     if (this.temperature && (this.temperature < 0 || this.temperature > 1)) {
-      throw new Error("`temperature` must be in the range of [0.0,1.0]")
+      throw new Error("`temperature` must be in the range of [0.0,1.0]");
     }
 
-    this.topP = fields?.topP ?? this.topP
+    this.topP = fields?.topP ?? this.topP;
     if (this.topP && this.topP < 0) {
-      throw new Error("`topP` must be a positive integer")
+      throw new Error("`topP` must be a positive integer");
     }
 
     if (this.topP && this.topP > 1) {
-      throw new Error("`topP` must be below 1.")
+      throw new Error("`topP` must be below 1.");
     }
 
-    this.topK = fields?.topK ?? this.topK
+    this.topK = fields?.topK ?? this.topK;
     if (this.topK && this.topK < 0) {
-      throw new Error("`topK` must be a positive integer")
+      throw new Error("`topK` must be a positive integer");
     }
 
-    this.stopSequences = fields?.stopSequences ?? this.stopSequences
+    this.stopSequences = fields?.stopSequences ?? this.stopSequences;
 
-    this.apiKey = fields?.apiKey ?? getEnvironmentVariable("GOOGLE_API_KEY")
+    this.apiKey = fields?.apiKey ?? getEnvironmentVariable("GOOGLE_API_KEY");
     if (!this.apiKey) {
       throw new Error(
         "Please set an API key for Google GenerativeAI " +
-        "in the environment variable GOOGLE_API_KEY " +
-        "or in the `apiKey` field of the " +
-        "ChatGoogleGenerativeAI constructor"
-      )
+          "in the environment variable GOOGLE_API_KEY " +
+          "or in the `apiKey` field of the " +
+          "ChatGoogleGenerativeAI constructor",
+      );
     }
 
-    this.apiVersion = fields?.apiVersion ?? this.apiVersion
+    this.apiVersion = fields?.apiVersion ?? this.apiVersion;
 
-    this.safetySettings = fields?.safetySettings ?? this.safetySettings
+    this.safetySettings = fields?.safetySettings ?? this.safetySettings;
     if (this.safetySettings && this.safetySettings.length > 0) {
       const safetySettingsSet = new Set(
-        this.safetySettings.map((s) => s.category)
-      )
+        this.safetySettings.map((s) => s.category),
+      );
       if (safetySettingsSet.size !== this.safetySettings.length) {
         throw new Error(
-          "The categories in `safetySettings` array must be unique"
-        )
+          "The categories in `safetySettings` array must be unique",
+        );
       }
     }
 
-    this.streaming = fields?.streaming ?? this.streaming
+    this.streaming = fields?.streaming ?? this.streaming;
 
-    this.client = new GenerativeAI(this.apiKey).getGenerativeModel({
-      model: this.model,
-      safetySettings: this.safetySettings as SafetySetting[],
-      generationConfig: {
-        candidateCount: 1,
-        stopSequences: this.stopSequences,
-        maxOutputTokens: this.maxOutputTokens,
-        temperature: this.temperature,
-        topP: this.topP,
-        topK: this.topK,
+    this.client = new GenerativeAI(this.apiKey).getGenerativeModel(
+      {
+        model: this.model,
+        safetySettings: this.safetySettings as SafetySetting[],
+        generationConfig: {
+          candidateCount: 1,
+          stopSequences: this.stopSequences,
+          maxOutputTokens: this.maxOutputTokens,
+          temperature: this.temperature,
+          topP: this.topP,
+          topK: this.topK,
+        },
       },
-    }, { apiVersion: this.apiVersion, baseUrl: fields?.baseUrl })
+      { apiVersion: this.apiVersion, baseUrl: fields?.baseUrl },
+    );
   }
 
   _combineLLMOutput() {
-    return []
+    return [];
   }
 
   _llmType() {
-    return "googlegenerativeai"
+    return "googlegenerativeai";
   }
 
   async _generate(
     messages: BaseMessage[],
     options: this["ParsedCallOptions"],
-    runManager?: CallbackManagerForLLMRun
+    runManager?: CallbackManagerForLLMRun,
   ): Promise<ChatResult> {
     const prompt = convertBaseMessagesToContent(
       messages,
-      this._isMultimodalModel
-    )
+      this._isMultimodalModel,
+    );
 
     // Handle streaming
     if (this.streaming) {
-      const tokenUsage: TokenUsage = {}
-      const stream = this._streamResponseChunks(messages, options, runManager)
-      const finalChunks: Record<number, ChatGenerationChunk> = {}
+      const tokenUsage: TokenUsage = {};
+      const stream = this._streamResponseChunks(messages, options, runManager);
+      const finalChunks: Record<number, ChatGenerationChunk> = {};
       for await (const chunk of stream) {
         const index =
-          (chunk.generationInfo as NewTokenIndices)?.completion ?? 0
+          (chunk.generationInfo as NewTokenIndices)?.completion ?? 0;
         if (finalChunks[index] === undefined) {
-          finalChunks[index] = chunk
+          finalChunks[index] = chunk;
         } else {
-          finalChunks[index] = finalChunks[index].concat(chunk)
+          finalChunks[index] = finalChunks[index].concat(chunk);
         }
       }
       const generations = Object.entries(finalChunks)
         .sort(([aKey], [bKey]) => parseInt(aKey, 10) - parseInt(bKey, 10))
-        .map(([_, value]) => value)
+        .map(([_, value]) => value);
 
-      return { generations, llmOutput: { estimatedTokenUsage: tokenUsage } }
+      return { generations, llmOutput: { estimatedTokenUsage: tokenUsage } };
     }
 
     const res = await this.caller.callWithOptions(
       { signal: options?.signal },
       async () => {
-        let output
+        let output;
         try {
           output = await this.client.generateContent({
             contents: prompt,
-          })
+          });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
           // TODO: Improve error handling
           if (e.message?.includes("400 Bad Request")) {
-            e.status = 400
+            e.status = 400;
           }
-          throw e
+          throw e;
         }
-        return output
-      }
-    )
-    const generationResult = mapGenerateContentResultToChatResult(res.response)
+        return output;
+      },
+    );
+    const generationResult = mapGenerateContentResultToChatResult(res.response);
     await runManager?.handleLLMNewToken(
-      generationResult.generations[0].text ?? ""
-    )
-    return generationResult
+      generationResult.generations[0].text ?? "",
+    );
+    return generationResult;
   }
 
   async *_streamResponseChunks(
     messages: BaseMessage[],
     options: this["ParsedCallOptions"],
-    runManager?: CallbackManagerForLLMRun
+    runManager?: CallbackManagerForLLMRun,
   ): AsyncGenerator<ChatGenerationChunk> {
     const prompt = convertBaseMessagesToContent(
       messages,
-      this._isMultimodalModel
-    )
+      this._isMultimodalModel,
+    );
     const stream = await this.caller.callWithOptions(
       { signal: options?.signal },
       async () => {
         const { stream } = await this.client.generateContentStream({
           contents: prompt,
-        })
-        return stream
-      }
-    )
+        });
+        return stream;
+      },
+    );
 
     for await (const response of stream) {
-      const chunk = convertResponseContentToChatGenerationChunk(response)
+      const chunk = convertResponseContentToChatGenerationChunk(response);
       if (!chunk) {
-        continue
+        continue;
       }
 
-      yield chunk
-      await runManager?.handleLLMNewToken(chunk.text ?? "")
+      yield chunk;
+      await runManager?.handleLLMNewToken(chunk.text ?? "");
     }
   }
 }

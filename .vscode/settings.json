@@ -26,8 +26,7 @@
     "nuxt",
     "Slideover"
   ],
-  "i18n-ally.localesPaths": [
-    "locales"
-  ],
+  "i18n-ally.localesPaths": ["locales"],
   "i18n-ally.keystyle": "nested",
+  "editor.tabSize": 2
 }

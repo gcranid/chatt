@@ -1,7 +1,10 @@
-import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts"
-import { BaseMessage } from '@langchain/core/messages'
-import { ChatOpenAI } from '@langchain/openai'
-import { JsonOutputParser } from "@langchain/core/output_parsers"
+import {
+  ChatPromptTemplate,
+  MessagesPlaceholder,
+} from "@langchain/core/prompts";
+import { BaseMessage } from "@langchain/core/messages";
+import { ChatOpenAI } from "@langchain/openai";
+import { JsonOutputParser } from "@langchain/core/output_parsers";
 
 const PROMPT = `
 Given a chat history and the latest user question which might reference context in the chat history, formulate a standalone question which can be understood without the chat history.
@@ -13,17 +16,17 @@ Respond with the following JSON format:
   "input": "What is its capital?",
   "output": "What is the capital of France?"
 }}
-`
+`;
 const CoreferenceResolutionPrompt = ChatPromptTemplate.fromMessages([
   ["system", PROMPT],
   new MessagesPlaceholder("chat_history"),
-  ["human", "{input}"]
-])
+  ["human", "{input}"],
+]);
 
 export type CorefResult = {
-  input: string
-  output: string
-}
+  input: string;
+  output: string;
+};
 
 export const resolveCoreference = async (
   userInput: string,
@@ -33,18 +36,18 @@ export const resolveCoreference = async (
   if (openAIApiKey?.length ?? 0 > 0) {
     const prompt = await CoreferenceResolutionPrompt.format({
       chat_history: chatHistory,
-      input: userInput
-    })
+      input: userInput,
+    });
     const llm = new ChatOpenAI({
       openAIApiKey,
-      modelName: "gpt-4o"
-    })
-    const chain = llm.pipe(new JsonOutputParser<CorefResult>())
-    return await chain.invoke(prompt)
+      modelName: "gpt-4o",
+    });
+    const chain = llm.pipe(new JsonOutputParser<CorefResult>());
+    return await chain.invoke(prompt);
   } else {
     return {
       input: userInput,
-      output: userInput
-    }
+      output: userInput,
+    };
   }
-}
+};

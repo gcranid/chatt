@@ -1,32 +1,32 @@
-import { DocumentInterface } from "@langchain/core/documents"
-import { BaseDocumentCompressor } from "@langchain/core/retrievers/document_compressors"
-import { getEnvironmentVariable } from "@langchain/core/utils/env"
-import { CohereClient } from "cohere-ai"
+import { DocumentInterface } from "@langchain/core/documents";
+import { BaseDocumentCompressor } from "@langchain/core/retrievers/document_compressors";
+import { getEnvironmentVariable } from "@langchain/core/utils/env";
+import { CohereClient } from "cohere-ai";
 
 export interface CohereRerankArgs {
   /**
    * The API key to use.
    * @default {process.env.COHERE_API_KEY}
    */
-  apiKey?: string
+  apiKey?: string;
   /**
    * The name of the model to use.
    * @default {"rerank-english-v2.0"}
    */
-  model?: string
+  model?: string;
   /**
    * How many documents to return.
    * @default {3}
    */
-  topN?: number
+  topN?: number;
   /**
    * The maximum number of chunks per document.
    */
-  maxChunksPerDoc?: number
+  maxChunksPerDoc?: number;
   /**
    * Base URL for the Cohere API.
    */
-  baseUrl?: string
+  baseUrl?: string;
 }
 
 /**
@@ -37,26 +37,26 @@ export class CohereRerank extends BaseDocumentCompressor {
 
   topN = 3;
 
-  client: CohereClient
+  client: CohereClient;
 
-  maxChunksPerDoc: number | undefined
+  maxChunksPerDoc: number | undefined;
 
   constructor(fields?: CohereRerankArgs) {
-    super()
-    const token = fields?.apiKey ?? getEnvironmentVariable("COHERE_API_KEY")
+    super();
+    const token = fields?.apiKey ?? getEnvironmentVariable("COHERE_API_KEY");
     if (!token) {
-      throw new Error("No API key provided for CohereRerank.")
+      throw new Error("No API key provided for CohereRerank.");
     }
 
-    const cohereClientOptions = { token }
+    const cohereClientOptions = { token };
     if (fields?.baseUrl) {
-      cohereClientOptions.environment = fields.baseUrl
+      cohereClientOptions.environment = fields.baseUrl;
     }
 
-    this.client = new CohereClient(cohereClientOptions)
-    this.model = fields?.model ?? this.model
-    this.topN = fields?.topN ?? this.topN
-    this.maxChunksPerDoc = fields?.maxChunksPerDoc
+    this.client = new CohereClient(cohereClientOptions);
+    this.model = fields?.model ?? this.model;
+    this.topN = fields?.topN ?? this.topN;
+    this.maxChunksPerDoc = fields?.maxChunksPerDoc;
   }
 
   /**
@@ -69,24 +69,24 @@ export class CohereRerank extends BaseDocumentCompressor {
    */
   async compressDocuments(
     documents: Array<DocumentInterface>,
-    query: string
+    query: string,
   ): Promise<Array<DocumentInterface>> {
-    const _docs = documents.map((doc) => doc.pageContent)
+    const _docs = documents.map((doc) => doc.pageContent);
     const { results } = await this.client.rerank({
       model: this.model,
       query,
       documents: _docs,
       topN: this.topN,
       maxChunksPerDoc: this.maxChunksPerDoc,
-    })
-    const finalResults: Array<DocumentInterface> = []
+    });
+    const finalResults: Array<DocumentInterface> = [];
     for (let i = 0; i < results.length; i += 1) {
-      const result = results[i]
-      const doc = documents[result.index]
-      doc.metadata.relevanceScore = result.relevanceScore
-      finalResults.push(doc)
+      const result = results[i];
+      const doc = documents[result.index];
+      doc.metadata.relevanceScore = result.relevanceScore;
+      finalResults.push(doc);
     }
-    return finalResults
+    return finalResults;
   }
 
   /**
@@ -105,32 +105,32 @@ export class CohereRerank extends BaseDocumentCompressor {
     documents: Array<DocumentInterface | string | Record<string, string>>,
     query: string,
     options?: {
-      model?: string
-      topN?: number
-      maxChunksPerDoc?: number
-    }
+      model?: string;
+      topN?: number;
+      maxChunksPerDoc?: number;
+    },
   ): Promise<Array<{ index: number; relevanceScore: number }>> {
     const docs = documents.map((doc) => {
       if (typeof doc === "string") {
-        return doc
+        return doc;
       }
-      return doc.pageContent
-    })
-    const model = options?.model ?? this.model
-    const topN = options?.topN ?? this.topN
-    const maxChunksPerDoc = options?.maxChunksPerDoc ?? this.maxChunksPerDoc
+      return doc.pageContent;
+    });
+    const model = options?.model ?? this.model;
+    const topN = options?.topN ?? this.topN;
+    const maxChunksPerDoc = options?.maxChunksPerDoc ?? this.maxChunksPerDoc;
     const { results } = await this.client.rerank({
       model,
       query,
       documents: docs,
       topN,
       maxChunksPerDoc,
-    })
+    });
 
     const resultObjects = results.map((result) => ({
       index: result.index,
       relevanceScore: result.relevanceScore,
-    }))
-    return resultObjects
+    }));
+    return resultObjects;
   }
 }

@@ -1,5 +1,5 @@
-declare module '#auth' {
+declare module "#auth" {
   interface SessionData {
-    role: 'superadmin' | 'admin' | 'user'
+    role: "superadmin" | "admin" | "user";
   }
 }

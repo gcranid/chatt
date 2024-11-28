@@ -1,60 +1,72 @@
 <script lang="ts" setup>
-import type { ModelInfo } from '~/composables/useModels'
-import { onMounted } from 'vue'
+import type { ModelInfo } from "~/composables/useModels";
+import { onMounted } from "vue";
 
-withDefaults(defineProps<{
-  autoDefault?: boolean,
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
-}>(), {
-  autoDefault: true,
-})
+withDefaults(
+  defineProps<{
+    autoDefault?: boolean;
+    size?: "xs" | "sm" | "md" | "lg" | "xl";
+  }>(),
+  {
+    autoDefault: true,
+  },
+);
 
 const emits = defineEmits<{
-  change: [models: string[], modelsRaw: ModelInfo[]]
-}>()
+  change: [models: string[], modelsRaw: ModelInfo[]];
+}>();
 
-const models = defineModel<string[]>({ default: [] })
+const models = defineModel<string[]>({ default: [] });
 
-const { t } = useI18n()
-const { chatModels, loadModels } = useModels()
+const { t } = useI18n();
+const { chatModels, loadModels } = useModels();
 
 // Ensure models are loaded when component mounts
 onMounted(async () => {
-  await loadModels()
-})
+  await loadModels();
+});
 
 const uiMenu = {
-  container: 'z-20 group w-[unset] whitespace-nowrap !w-auto',
-  option: { base: 'cursor-default select-none relative flex items-center justify-between gap-1 pr-8' }
-}
+  container: "z-20 group w-[unset] whitespace-nowrap !w-auto",
+  option: {
+    base: "cursor-default select-none relative flex items-center justify-between gap-1 pr-8",
+  },
+};
 
-watch([chatModels, models], ([data1, data2]) => {
-  if (data1.length > 0 && data2.length > 0) {
-    const arr = data2.filter(m => data1.some(d => d.value === m))
-    if (arr.length !== data2.length) {
-      models.value = arr
+watch(
+  [chatModels, models],
+  ([data1, data2]) => {
+    if (data1.length > 0 && data2.length > 0) {
+      const arr = data2.filter((m) => data1.some((d) => d.value === m));
+      if (arr.length !== data2.length) {
+        models.value = arr;
+      }
     }
-  }
-}, { immediate: true })
+  },
+  { immediate: true },
+);
 
 function onChange(models: string[]) {
-  const modelsRaw = chatModels.value.filter(model => models.includes(model.value))
-  emits('change', models, modelsRaw)
+  const modelsRaw = chatModels.value.filter((model) =>
+    models.includes(model.value),
+  );
+  emits("change", models, modelsRaw);
 }
-
 </script>
 
 <template>
   <ClientOnly>
-    <USelectMenu v-model="models"
-                 :options="chatModels"
-                 value-attribute="value"
-                 :size
-                 multiple
-                 :ui-menu="uiMenu"
-                 :popper="{ placement: 'top-start' }"
-                 :placeholder="t('global.selectModels')"
-                 @change="onChange">
+    <USelectMenu
+      v-model="models"
+      :options="chatModels"
+      value-attribute="value"
+      :size
+      multiple
+      :ui-menu="uiMenu"
+      :popper="{ placement: 'top-start' }"
+      :placeholder="t('global.selectModels')"
+      @change="onChange"
+    >
       <template #label>
         <div class="text-muted inline-flex items-center">
           <UIcon name="i-heroicons-rectangle-stack" class="mr-1"></UIcon>

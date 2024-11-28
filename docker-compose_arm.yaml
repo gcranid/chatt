@@ -30,4 +30,3 @@ services:
 volumes:
   chromadb_data:
   redis_data:
-

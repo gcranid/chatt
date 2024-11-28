@@ -18,6 +18,7 @@ English | [简体中文](README.zh-Hans.md)
 - Chat with LLMs based on knowledge base
 
 `ChatOllama` feature list:
+
 - Ollama models management
 - Knowledge bases management
 - Chat
@@ -56,53 +57,54 @@ If you'd like to run with the latest code base and apply changes as needed, you 
 
 1. Install and run Ollama server
 
-    You will need an Ollama server running. Follow the installation guide of [Ollama](https://github.com/ollama/ollama). By default, it's running on http://localhost:11434.    
+   You will need an Ollama server running. Follow the installation guide of [Ollama](https://github.com/ollama/ollama). By default, it's running on http://localhost:11434.
 
 2. Install Chroma
 
-    Please refer to [https://docs.trychroma.com/getting-started](https://docs.trychroma.com/getting-started) for Chroma installation.
+   Please refer to [https://docs.trychroma.com/getting-started](https://docs.trychroma.com/getting-started) for Chroma installation.
 
-    We recommend you run it in a docker container:
+   We recommend you run it in a docker container:
 
-    ```bash
-    #https://hub.docker.com/r/chromadb/chroma/tags
+   ```bash
+   #https://hub.docker.com/r/chromadb/chroma/tags
 
-    docker pull chromadb/chroma
-    docker run -d -p 8000:8000 chromadb/chroma
-    ```
-    Now, ChromaDB is running on http://localhost:8000
+   docker pull chromadb/chroma
+   docker run -d -p 8000:8000 chromadb/chroma
+   ```
+
+   Now, ChromaDB is running on http://localhost:8000
 
 3. ChatOllama Setup
 
-    Now, we can complete the necessary setup to run ChatOllama.
+   Now, we can complete the necessary setup to run ChatOllama.
 
-    3.1 Copy the `.env.example` file to `.env` file:
+   3.1 Copy the `.env.example` file to `.env` file:
 
-    ```bash
-    cp .env.example .env
-    ```
+   ```bash
+   cp .env.example .env
+   ```
 
-    3.2 Make sure to install the dependencies:
+   3.2 Make sure to install the dependencies:
 
-    ```bash
-    pnpm install
-    ```
+   ```bash
+   pnpm install
+   ```
 
-    3.3 Run a migration to create your database tables with Prisma Migrate
+   3.3 Run a migration to create your database tables with Prisma Migrate
 
-    ```bash
-    pnpm prisma-migrate
-    ```
+   ```bash
+   pnpm prisma-migrate
+   ```
 
 4. Launch Development Server
 
-    > Make sure both __[Ollama Server](#ollama-server)__ and __[ChromaDB](#install-chromadb-and-startup)__ are running.
+   > Make sure both **[Ollama Server](#ollama-server)** and **[ChromaDB](#install-chromadb-and-startup)** are running.
 
-    Start the development server on `http://localhost:3000`:
+   Start the development server on `http://localhost:3000`:
 
-    ```bash
-    pnpm dev
-    ```
+   ```bash
+   pnpm dev
+   ```
 
 ### Use with Docker
 
@@ -121,7 +123,9 @@ Make sure you initialize the SQLite database as below if you are launching the d
 ```shell
 $ docker compose exec chatollama npx prisma migrate dev
 ```
+
 #### Prerequisites for knowledge bases
+
 When using KnowledgeBases, we need a valid embedding model in place. It can be one of the models downloaded by Ollama or from 3rd party service provider for example, OpenAI.
 
 **Ollama Managed Embedding Model**
@@ -165,6 +169,6 @@ We have provided a proxy configuration feature. For specific usage, please click
 As ChatOllama is still under active development, features, interfaces and database schema may be changed. Please follow the instructions below in your every `git pull` to make sure your dependencies and database schema are always in sync.
 
 1. Install the latest dependencies
-    - `pnpm install`
+   - `pnpm install`
 2. Prisma migrate
-    - `pnpm prisma-migrate`
+   - `pnpm prisma-migrate`

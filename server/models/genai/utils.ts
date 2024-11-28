@@ -2,7 +2,7 @@ import {
   EnhancedGenerateContentResponse,
   Content,
   Part,
-} from "@google/generative-ai"
+} from "@google/generative-ai";
 import {
   AIMessage,
   AIMessageChunk,
@@ -11,19 +11,19 @@ import {
   MessageContent,
   MessageContentComplex,
   isBaseMessage,
-} from "@langchain/core/messages"
+} from "@langchain/core/messages";
 import {
   ChatGeneration,
   ChatGenerationChunk,
   ChatResult,
-} from "@langchain/core/outputs"
+} from "@langchain/core/outputs";
 
 export function getMessageAuthor(message: BaseMessage) {
-  const type = message._getType()
+  const type = message._getType();
   if (ChatMessage.isInstance(message)) {
-    return message.role
+    return message.role;
   }
-  return message.name ?? type
+  return message.name ?? type;
 }
 
 /**
@@ -40,12 +40,12 @@ export function convertAuthorToRole(author: string) {
      * */
     case "ai":
     case "model": // getMessageAuthor returns message.name. code ex.: return message.name ?? type;
-      return "model"
+      return "model";
     case "system":
     case "human":
-      return "user"
+      return "user";
     default:
-      throw new Error(`Unknown / unsupported author: ${author}`)
+      throw new Error(`Unknown / unsupported author: ${author}`);
   }
 }
 
@@ -56,47 +56,47 @@ function messageContentMedia(content: MessageContentComplex): Part {
         mimeType: content.mimeType,
         data: content.data,
       },
-    }
+    };
   }
 
-  throw new Error("Invalid media content")
+  throw new Error("Invalid media content");
 }
 
 export function convertMessageContentToParts(
   content: MessageContent,
-  isMultimodalModel: boolean
+  isMultimodalModel: boolean,
 ): Part[] {
   if (typeof content === "string") {
-    return [{ text: content }]
+    return [{ text: content }];
   }
 
   return content.map((c) => {
     if (c.type === "text") {
       return {
         text: c.text,
-      }
+      };
     }
 
     if (c.type === "image_url") {
       if (!isMultimodalModel) {
-        throw new Error(`This model does not support images`)
+        throw new Error(`This model does not support images`);
       }
-      let source
+      let source;
       if (typeof c.image_url === "string") {
-        source = c.image_url
+        source = c.image_url;
       } else if (typeof c.image_url === "object" && "url" in c.image_url) {
-        source = c.image_url.url
+        source = c.image_url.url;
       } else {
-        throw new Error("Please provide image as base64 encoded data URL")
+        throw new Error("Please provide image as base64 encoded data URL");
       }
-      const [dm, data] = source.split(",")
+      const [dm, data] = source.split(",");
       if (!dm.startsWith("data:")) {
-        throw new Error("Please provide image as base64 encoded data URL")
+        throw new Error("Please provide image as base64 encoded data URL");
       }
 
-      const [mimeType, encoding] = dm.replace(/^data:/, "").split(";")
+      const [mimeType, encoding] = dm.replace(/^data:/, "").split(";");
       if (encoding !== "base64") {
-        throw new Error("Please provide image as base64 encoded data URL")
+        throw new Error("Please provide image as base64 encoded data URL");
       }
 
       return {
@@ -104,77 +104,77 @@ export function convertMessageContentToParts(
           data,
           mimeType,
         },
-      }
+      };
     } else if (c.type === "media") {
-      return messageContentMedia(c)
+      return messageContentMedia(c);
     }
-    throw new Error(`Unknown content type ${(c as { type: string }).type}`)
-  })
+    throw new Error(`Unknown content type ${(c as { type: string }).type}`);
+  });
 }
 
 export function convertBaseMessagesToContent(
   messages: BaseMessage[],
-  isMultimodalModel: boolean
+  isMultimodalModel: boolean,
 ) {
   return messages.reduce<{
-    content: Content[]
-    mergeWithPreviousContent: boolean
+    content: Content[];
+    mergeWithPreviousContent: boolean;
   }>(
     (acc, message, index) => {
       if (!isBaseMessage(message)) {
-        throw new Error("Unsupported message input")
+        throw new Error("Unsupported message input");
       }
-      const author = getMessageAuthor(message)
+      const author = getMessageAuthor(message);
       if (author === "system" && index !== 0) {
-        throw new Error("System message should be the first one")
+        throw new Error("System message should be the first one");
       }
-      const role = convertAuthorToRole(author)
+      const role = convertAuthorToRole(author);
 
-      const prevContent = acc.content[acc.content.length]
+      const prevContent = acc.content[acc.content.length];
       if (
         !acc.mergeWithPreviousContent &&
         prevContent &&
         prevContent.role === role
       ) {
         throw new Error(
-          "Google Generative AI requires alternate messages between authors"
-        )
+          "Google Generative AI requires alternate messages between authors",
+        );
       }
 
       const parts = convertMessageContentToParts(
         message.content,
-        isMultimodalModel
-      )
+        isMultimodalModel,
+      );
 
       if (acc.mergeWithPreviousContent) {
-        const prevContent = acc.content[acc.content.length - 1]
+        const prevContent = acc.content[acc.content.length - 1];
         if (!prevContent) {
           throw new Error(
-            "There was a problem parsing your system message. Please try a prompt without one."
-          )
+            "There was a problem parsing your system message. Please try a prompt without one.",
+          );
         }
-        prevContent.parts.push(...parts)
+        prevContent.parts.push(...parts);
 
         return {
           mergeWithPreviousContent: false,
           content: acc.content,
-        }
+        };
       }
       const content: Content = {
         role,
         parts,
-      }
+      };
       return {
         mergeWithPreviousContent: author === "system",
         content: [...acc.content, content],
-      }
+      };
     },
-    { content: [], mergeWithPreviousContent: false }
-  ).content
+    { content: [], mergeWithPreviousContent: false },
+  ).content;
 }
 
 export function mapGenerateContentResultToChatResult(
-  response: EnhancedGenerateContentResponse
+  response: EnhancedGenerateContentResponse,
 ): ChatResult {
   // if rejected or error, return empty generations with reason in filters
   if (
@@ -187,12 +187,12 @@ export function mapGenerateContentResultToChatResult(
       llmOutput: {
         filters: response.promptFeedback,
       },
-    }
+    };
   }
 
-  const [candidate] = response.candidates
-  const { content, ...generationInfo } = candidate
-  const text = content?.parts[0]?.text ?? ""
+  const [candidate] = response.candidates;
+  const { content, ...generationInfo } = candidate;
+  const text = content?.parts[0]?.text ?? "";
 
   const generation: ChatGeneration = {
     text,
@@ -202,22 +202,22 @@ export function mapGenerateContentResultToChatResult(
       additional_kwargs: generationInfo,
     }),
     generationInfo,
-  }
+  };
 
   return {
     generations: [generation],
-  }
+  };
 }
 
 export function convertResponseContentToChatGenerationChunk(
-  response: EnhancedGenerateContentResponse
+  response: EnhancedGenerateContentResponse,
 ): ChatGenerationChunk | null {
   if (!response.candidates || response.candidates.length === 0) {
-    return null
+    return null;
   }
-  const [candidate] = response.candidates
-  const { content, ...generationInfo } = candidate
-  const text = content?.parts[0]?.text ?? ""
+  const [candidate] = response.candidates;
+  const { content, ...generationInfo } = candidate;
+  const text = content?.parts[0]?.text ?? "";
 
   return new ChatGenerationChunk({
     text,
@@ -229,5 +229,5 @@ export function convertResponseContentToChatGenerationChunk(
       additional_kwargs: {},
     }),
     generationInfo,
-  })
+  });
 }

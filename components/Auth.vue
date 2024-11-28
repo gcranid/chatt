@@ -1,30 +1,41 @@
 <script setup lang="ts">
-const { t } = useI18n()
+const { t } = useI18n();
 
-const { signOut, data, status } = useAuth()
+const { signOut, data, status } = useAuth();
 const onClickSignOut = async () => {
-  await signOut({ callbackUrl: '/' })
-}
+  await signOut({ callbackUrl: "/" });
+};
 
 const items = [
-  [{
-    label: t('auth.signOut'),
-    icon: 'i-heroicons-arrow-right-start-on-rectangle-16-solid',
-    click: async () => {
-      await onClickSignOut()
-    }
-  }]
-]
+  [
+    {
+      label: t("auth.signOut"),
+      icon: "i-heroicons-arrow-right-start-on-rectangle-16-solid",
+      click: async () => {
+        await onClickSignOut();
+      },
+    },
+  ],
+];
 
 const buttonColor = computed(() => {
-  return data?.value?.role === 'superadmin' ? 'red' : 'white'
-})
+  return data?.value?.role === "superadmin" ? "red" : "white";
+});
 </script>
 <template>
-  <UButton v-if="status === 'unauthenticated'" :label="t('auth.signIn')" to="/login" color="white"></UButton>
+  <UButton
+    v-if="status === 'unauthenticated'"
+    :label="t('auth.signIn')"
+    to="/login"
+    color="white"
+  ></UButton>
   <div v-else>
     <UDropdown :items="items" :popper="{ placement: 'bottom-end' }">
-      <UButton :color="buttonColor" :label="data?.name" trailing-icon="i-heroicons-chevron-down-20-solid" />
+      <UButton
+        :color="buttonColor"
+        :label="data?.name"
+        trailing-icon="i-heroicons-chevron-down-20-solid"
+      />
     </UDropdown>
   </div>
 </template>
