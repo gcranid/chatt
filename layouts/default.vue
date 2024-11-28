@@ -37,7 +37,7 @@ watch(
           <ColorMode />
         </div>
         <ULink
-          to="https://github.com/sugarforever/chat-ollama"
+          to="https://github.com/gcranid/chatt"
           target="_blank"
           class="i-mdi-github text-2xl ml-2 mr-4"
         ></ULink>

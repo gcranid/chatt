@@ -1,8 +1,6 @@
-English | [简体中文](README.zh-Hans.md)
+# Chatt
 
-# ChatOllama
-
-`ChatOllama` is an open source chatbot based on LLMs. It supports a wide range of language models including:
+`Chatt` is an open source chatbot based on LLMs. It supports a wide range of language models including:
 
 - Ollama served models
 - OpenAI
@@ -12,33 +10,25 @@ English | [简体中文](README.zh-Hans.md)
 - Gemini
 - Groq
 
-`ChatOllama` supports multiple types of chat:
+`Chatt` supports multiple types of chat:
 
 - Free chat with LLMs
 - Chat with LLMs based on knowledge base
 
-`ChatOllama` feature list:
+`Chatt` feature list:
 
 - Ollama models management
 - Knowledge bases management
 - Chat
 - Commercial LLMs API keys management
 
-## Join Our Community
-
-If you are a user, contributor, or even just new to `ChatOllama`, you are more than welcome to join our community on Discord by clicking the [invite link](https://discord.gg/TjhZGYv5pC).
-
-If you are a contributor, the channel `technical-discussion` is for you, where we discuss technical stuff.
-
-If you have any issue in `ChatOllama` usage, please report to channel `customer-support`. We will help you out as soon as we can.
-
 ## Quick Start
 
-As a user of `ChatOllama`, please walk through the document below, to make sure you get all the components up and running before starting using `ChatOllama`.
+As a user of `Chatt`, please walk through the document below, to make sure you get all the components up and running before starting using `Chatt`.
 
 ### Supported Vector Databases
 
-`ChatOllama` supported 2 types of vector databases: Milvus and Chroma.
+`Chatt` supported 2 types of vector databases: Milvus and Chroma.
 
 Please refer to the `.env.example` for how to work with your vector database setup.
 
@@ -49,7 +39,7 @@ CHROMADB_URL=http://localhost:8000
 MILVUS_URL=http://localhost:19530
 ```
 
-By default `ChatOllama` is using Chroma. If you'd like to use Milvus, set `VECTOR_STORE` to `milvus` and specify the corresponding URL. It works both in the development server and Docker containers.
+By default `Chatt` is using Chroma. If you'd like to use Milvus, set `VECTOR_STORE` to `milvus` and specify the corresponding URL. It works both in the development server and Docker containers.
 
 ### Use with Nuxt 3 Development Server
 
@@ -74,9 +64,9 @@ If you'd like to run with the latest code base and apply changes as needed, you 
 
    Now, ChromaDB is running on http://localhost:8000
 
-3. ChatOllama Setup
+3. Chatt Setup
 
-   Now, we can complete the necessary setup to run ChatOllama.
+   Now, we can complete the necessary setup to run Chatt.
 
    3.1 Copy the `.env.example` file to `.env` file:
 
@@ -108,20 +98,20 @@ If you'd like to run with the latest code base and apply changes as needed, you 
 
 ### Use with Docker
 
-This is the easist way to use `ChatOllama`.
+This is the easist way to use `Chatt`.
 
-The only thing you need is a copy of [docker-compose.yaml](./docker-compose.yaml). Please download it and execute the command below to launch `ChatOllama`.
+The only thing you need is a copy of [docker-compose.yaml](./docker-compose.yaml). Please download it and execute the command below to launch `Chatt`.
 
 ```shell
 $ docker compose up
 ```
 
-As `ChatOllama` is running within a docker container, you should set Ollama server to `http://host.docker.internal:11434` in the Settings section, assuming your Ollama server is running locally with default port.
+As `Chatt` is running within a docker container, you should set Ollama server to `http://host.docker.internal:11434` in the Settings section, assuming your Ollama server is running locally with default port.
 
-Make sure you initialize the SQLite database as below if you are launching the dockerized `ChatOllama` for the first time:
+Make sure you initialize the SQLite database as below if you are launching the dockerized `Chatt` for the first time:
 
 ```shell
-$ docker compose exec chatollama npx prisma migrate dev
+$ docker compose exec Chatt npx prisma migrate dev
 ```
 
 #### Prerequisites for knowledge bases
@@ -154,11 +144,11 @@ There are 2 types of data storage, vector data and relational data. See the summ
 
 ##### Vector data
 
-With `docker-compose.yaml`, a dockerized Chroma database is run side by side with `ChatOllama`. The data is persisted in a docker volume.
+With `docker-compose.yaml`, a dockerized Chroma database is run side by side with `Chatt`. The data is persisted in a docker volume.
 
 ##### Relational data
 
-The relational data including knowledge base records and their associated files are stored in a SQLite database file persisted and mounted from `~/.chatollama/chatollama.sqlite`.
+The relational data including knowledge base records and their associated files are stored in a SQLite database file persisted and mounted from `~/.Chatt/Chatt.sqlite`.
 
 #### Proxy
 
@@ -166,7 +156,7 @@ We have provided a proxy configuration feature. For specific usage, please click
 
 ## Developers Guide
 
-As ChatOllama is still under active development, features, interfaces and database schema may be changed. Please follow the instructions below in your every `git pull` to make sure your dependencies and database schema are always in sync.
+As Chatt is still under active development, features, interfaces and database schema may be changed. Please follow the instructions below in your every `git pull` to make sure your dependencies and database schema are always in sync.
 
 1. Install the latest dependencies
    - `pnpm install`

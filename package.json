@@ -1,5 +1,5 @@
 {
-  "name": "chat-ollama",
+  "name": "chatt",
   "private": true,
   "type": "module",
   "scripts": {
